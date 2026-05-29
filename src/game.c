@@ -60,47 +60,53 @@ void game_run(Game *game)
     unsigned int uniform_color_location = glGetUniformLocation(shader_program, "uniform_color");
 
     // Vertex Data
-    float vertex_data_1[] = {
-        -0.1f, 0.4f, 0.0f,
-        -0.6f, -0.6f, -0.5f,
-        0.4f, -0.6f, 0.5f
+    float vertex_data[] = {
+        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
 
-    float vertex_data_2[] = {
-        0.1f, 0.6f, 0.0f,
-        -0.4f, -0.4f, 0.5f,
-        0.6f, -0.4f, -0.5f
+    unsigned int index_data[] = {
+        0, 1, 2,
+        0, 2, 3
     };
 
     // VBO
-    unsigned int vbo[2];
-    glGenBuffers(2, vbo);
+    unsigned int vbo[1];
+    glGenBuffers(1, vbo);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data_1), vertex_data_1, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data_2), vertex_data_2, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    // EBO
+    unsigned int ebo[1];
+    glGenBuffers(1, ebo);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_data), index_data, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     // VAO
-    unsigned int vao[2];
-    glGenVertexArrays(2, vao);
+    unsigned int vao[1];
+    glGenVertexArrays(1, vao);
 
     glBindVertexArray(vao[0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindVertexArray(vao[1]);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
 
     glBindVertexArray(0);
 
@@ -112,18 +118,13 @@ void game_run(Game *game)
             if(event.type == SDL_EVENT_QUIT)
                 open = false;
 
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
 
         glBindVertexArray(vao[0]);
-        glUniform4f(uniform_color_location, 0.0f, 0.0f, 1.0f, 0.8f);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glBindVertexArray(vao[1]);
-        glUniform4f(uniform_color_location, 1.0f, 1.0f, 0.0f, 0.8f);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
 
