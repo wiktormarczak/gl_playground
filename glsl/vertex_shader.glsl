@@ -4,8 +4,10 @@ layout (location = 1) in vec3 attribute_color;
 
 out vec3 vertex_color;
 
+uniform mat4 uniform_matrix;
+
 void main()
 {
-    gl_Position = vec4(attribute_position.x, attribute_position.y, attribute_position.z, 1.0);
+    gl_Position = uniform_matrix * vec4(attribute_position.x, attribute_position.y, attribute_position.z, 1.0);
     vertex_color = attribute_color;
 }

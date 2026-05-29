@@ -57,7 +57,15 @@ void game_run(Game *game)
 {
     // Shader
     unsigned int shader_program = get_shader_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
-    unsigned int uniform_color_location = glGetUniformLocation(shader_program, "uniform_color");
+    unsigned int uniform_matrix_location = glGetUniformLocation(shader_program, "uniform_matrix");
+
+    // Matrix
+    float matrix[] = {
+        0.707f, -0.707f, 0.0f, 0.0f,
+        0.707f, 0.707f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
 
     // Vertex Data
     float vertex_data[] = {
@@ -122,6 +130,8 @@ void game_run(Game *game)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
+
+        glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
