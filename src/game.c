@@ -47,6 +47,8 @@ Game *game_create()
 
     glViewport(0, 0, 800, 600);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     return game;
 }
@@ -59,15 +61,15 @@ void game_run(Game *game)
 
     // Vertex Data
     float vertex_data_1[] = {
-        0.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f
+        -0.1f, 0.4f, 0.0f,
+        -0.6f, -0.6f, -0.5f,
+        0.4f, -0.6f, 0.5f
     };
 
     float vertex_data_2[] = {
-        0.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, -0.5f
+        0.1f, 0.6f, 0.0f,
+        -0.4f, -0.4f, 0.5f,
+        0.6f, -0.4f, -0.5f
     };
 
     // VBO
@@ -110,17 +112,17 @@ void game_run(Game *game)
             if(event.type == SDL_EVENT_QUIT)
                 open = false;
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
 
         glBindVertexArray(vao[0]);
-        glUniform4f(uniform_color_location, 0.0f, 0.0f, 1.0f, 1.0f);
+        glUniform4f(uniform_color_location, 0.0f, 0.0f, 1.0f, 0.8f);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(vao[1]);
-        glUniform4f(uniform_color_location, 1.0f, 1.0f, 0.0f, 1.0f);
+        glUniform4f(uniform_color_location, 1.0f, 1.0f, 0.0f, 0.8f);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glBindVertexArray(0);
