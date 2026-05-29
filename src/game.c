@@ -1,5 +1,6 @@
 #include <gl_playground/game.h>
 #include <gl_playground/shaders.h>
+#include <gl_playground/matrix.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 #include <stdbool.h>
@@ -60,12 +61,7 @@ void game_run(Game *game)
     unsigned int uniform_matrix_location = glGetUniformLocation(shader_program, "uniform_matrix");
 
     // Matrix
-    float matrix[] = {
-        0.707f, -0.707f, 0.0f, 0.0f,
-        0.707f, 0.707f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
+    float matrix[16];
 
     // Vertex Data
     float vertex_data[] = {
@@ -131,6 +127,7 @@ void game_run(Game *game)
 
         glUseProgram(shader_program);
 
+        matrix_set_rotation(matrix, SDL_GetTicks() / 1000.0f);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);
