@@ -127,7 +127,7 @@ void game_run(Game *game)
 
         glUseProgram(shader_program);
 
-        matrix_set_rotation(matrix, SDL_GetTicks() / 1000.0f);
+        matrix_set_rotation_z(matrix, SDL_GetTicks() / 1000.0f);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);

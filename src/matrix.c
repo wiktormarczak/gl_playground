@@ -10,7 +10,27 @@ void matrix_set_identity(float matrix[])
         matrix[i] = 1.0f;
 }
 
-void matrix_set_rotation(float matrix[], float theta)
+void matrix_set_rotation_x(float matrix[], float theta)
+{
+    matrix_set_identity(matrix);
+
+    matrix[5] = cos(theta);
+    matrix[6] = -sin(theta);
+    matrix[9] = sin(theta);
+    matrix[10] = cos(theta);
+}
+
+void matrix_set_rotation_y(float matrix[], float theta)
+{
+    matrix_set_identity(matrix);
+
+    matrix[0] = cos(theta);
+    matrix[2] = sin(theta);
+    matrix[8] = -sin(theta);
+    matrix[10] = cos(theta);
+}
+
+void matrix_set_rotation_z(float matrix[], float theta)
 {
     matrix_set_identity(matrix);
 

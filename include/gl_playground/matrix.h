@@ -2,6 +2,9 @@
 #define MATRIX_H
 
 void matrix_set_identity(float matrix[]);
-void matrix_set_rotation(float matrix[], float theta);
+
+void matrix_set_rotation_x(float matrix[], float theta);
+void matrix_set_rotation_y(float matrix[], float theta);
+void matrix_set_rotation_z(float matrix[], float theta);
 
 #endif
