@@ -61,7 +61,7 @@ void game_run(Game *game)
     unsigned int uniform_matrix_location = glGetUniformLocation(shader_program, "uniform_matrix");
 
     // Matrix
-    float model[16], view[16], matrix[16];
+    float model[16], view[16], matrix[16], projection[16];
 
     // Vertex Data
     float vertex_data[] = {
@@ -115,7 +115,7 @@ void game_run(Game *game)
     glBindVertexArray(0);
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
-    float camera_x = 0.0f, camera_y = 0.0f, camera_z = 0.0f;
+    float camera_x = 0.0f, camera_y = 0.0f, camera_z = 1.0f;
 
     float prev_time = SDL_GetTicks(), delta_time = 0.0f;
 
@@ -140,10 +140,10 @@ void game_run(Game *game)
         if(keyboard[SDL_SCANCODE_SPACE])
             camera_y += delta_time * 0.001f;
 
-        if(keyboard[SDL_SCANCODE_S])
+        if(keyboard[SDL_SCANCODE_W])
             camera_z -= delta_time * 0.001f;
 
-        if(keyboard[SDL_SCANCODE_W])
+        if(keyboard[SDL_SCANCODE_S])
             camera_z += delta_time * 0.001f;
 
         // Render
@@ -152,9 +152,10 @@ void game_run(Game *game)
 
         glUseProgram(shader_program);
 
-        matrix_set_rotation_z(model, SDL_GetTicks() / 1000.0f);
+        matrix_set_rotation_x(model, SDL_GetTicks() / 1000.0f);
         matrix_set_translation(view, -camera_x, -camera_y, -camera_z);
-        matrix_multiply(matrix, view, model);
+        matrix_set_perspective_projection(projection, 3.14f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+        matrix_multiply_3(matrix, projection, view, model);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);

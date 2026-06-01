@@ -23,6 +23,13 @@ void matrix_multiply(float matrix[], float left[], float right[])
     }
 }
 
+void matrix_multiply_3(float matrix[], float a[], float b[], float c[])
+{
+    float ab[16];
+    matrix_multiply(ab, a, b);
+    matrix_multiply(matrix, ab, c);
+}
+
 void matrix_set_scaling(float matrix[], float x, float y, float z)
 {
     matrix_set_identity(matrix);
@@ -49,10 +56,7 @@ void matrix_set_rotation(float matrix[], float x, float y, float z)
     matrix_set_rotation_y(rotation_y, y);
     matrix_set_rotation_z(rotation_z, z);
 
-    float rotation_xy[16];
-    matrix_multiply(rotation_xy, rotation_x, rotation_y);
-
-    matrix_multiply(matrix, rotation_xy, rotation_z);
+    matrix_multiply_3(matrix, rotation_x, rotation_y, rotation_z);
 }
 
 void matrix_set_rotation_x(float matrix[], float theta)
@@ -83,4 +87,26 @@ void matrix_set_rotation_z(float matrix[], float theta)
     matrix[1] = -sin(theta);
     matrix[4] = sin(theta);
     matrix[5] = cos(theta);
+}
+
+void matrix_set_ortographic_projection(float matrix[], float height, float aspect, float near, float far)
+{
+    matrix_set_identity(matrix);
+
+    matrix[0] = 2.0f / (height * aspect);
+    matrix[5] = 2.0f / height;
+    matrix[10] = -2.0f / (far - near);
+    matrix[11] = -(far + near) / (far - near);
+}
+
+void matrix_set_perspective_projection(float matrix[], float fov, float aspect, float near, float far)
+{
+    matrix_set_identity(matrix);
+
+    matrix[0] = 1.0f / (tan(fov / 2.0f) * aspect);
+    matrix[5] = 1.0f / tan(fov / 2.0f);
+    matrix[10] = -(far + near) / (far - near);
+    matrix[11] = -2.0f * far * near / (far - near);
+    matrix[14] = -1.0f;
+    matrix[15] = 0.0f;
 }
