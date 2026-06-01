@@ -61,7 +61,7 @@ void game_run(Game *game)
     unsigned int uniform_matrix_location = glGetUniformLocation(shader_program, "uniform_matrix");
 
     // Matrix
-    float matrix[16];
+    float model[16], view[16], matrix[16];
 
     // Vertex Data
     float vertex_data[] = {
@@ -152,8 +152,9 @@ void game_run(Game *game)
 
         glUseProgram(shader_program);
 
-        // matrix_set_rotation_z(matrix, SDL_GetTicks() / 1000.0f);
-        matrix_set_translation(matrix, -camera_x, -camera_y, -camera_z);
+        matrix_set_rotation_z(model, SDL_GetTicks() / 1000.0f);
+        matrix_set_translation(view, -camera_x, -camera_y, -camera_z);
+        matrix_multiply(matrix, view, model);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);
