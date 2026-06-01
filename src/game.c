@@ -65,15 +65,29 @@ void game_run(Game *game)
 
     // Vertex Data
     float vertex_data[] = {
-        0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f
     };
 
     unsigned int index_data[] = {
         0, 1, 2,
-        0, 2, 3
+        0, 2, 3,
+        4, 0, 3,
+        4, 3, 7,
+        5, 4, 7,
+        5, 6, 7,
+        1, 5, 6,
+        1, 6, 2,
+        0, 1, 5,
+        0, 5, 4,
+        3, 2, 6,
+        3, 6, 7
     };
 
     // VBO
@@ -115,7 +129,10 @@ void game_run(Game *game)
     glBindVertexArray(0);
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
-    float camera_x = 0.0f, camera_y = 0.0f, camera_z = 1.0f;
+
+    matrix_set_translation(view, 0.0f, 0.0f, -1.0f);
+
+    SDL_SetWindowRelativeMouseMode(game->window, true);
 
     float prev_time = SDL_GetTicks(), delta_time = 0.0f;
 
@@ -125,26 +142,36 @@ void game_run(Game *game)
         // Input
         SDL_Event event;
         while(SDL_PollEvent(&event))
+        {
             if(event.type == SDL_EVENT_QUIT)
                 open = false;
 
+            if(event.type == SDL_EVENT_MOUSE_MOTION)
+            {
+                float xrel = event.motion.xrel;
+                float yrel = event.motion.yrel;
+
+                matrix_rotate(view, 0.01f * yrel * delta_time, 0.01f * xrel * delta_time, 0.0f);
+            }
+        }
+
         if(keyboard[SDL_SCANCODE_A])
-            camera_x -= delta_time * 0.001f;
+            matrix_translate(view, 0.001f * delta_time, 0.0f, 0.0f);
 
         if(keyboard[SDL_SCANCODE_D])
-            camera_x += delta_time * 0.001f;
+            matrix_translate(view, -0.001f * delta_time, 0.0f, 0.0f);
 
         if(keyboard[SDL_SCANCODE_LCTRL])
-            camera_y -= delta_time * 0.001f;
+            matrix_translate(view, 0.0f, 0.001f * delta_time, 0.0f);
 
         if(keyboard[SDL_SCANCODE_SPACE])
-            camera_y += delta_time * 0.001f;
+            matrix_translate(view, 0.0f, -0.001f * delta_time, 0.0f);
 
         if(keyboard[SDL_SCANCODE_W])
-            camera_z -= delta_time * 0.001f;
+            matrix_translate(view, 0.0f, 0.0f, 0.001f * delta_time);
 
         if(keyboard[SDL_SCANCODE_S])
-            camera_z += delta_time * 0.001f;
+            matrix_translate(view, 0.0f, 0.0f, -0.001f * delta_time);
 
         // Render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -153,13 +180,12 @@ void game_run(Game *game)
         glUseProgram(shader_program);
 
         matrix_set_rotation_x(model, SDL_GetTicks() / 1000.0f);
-        matrix_set_translation(view, -camera_x, -camera_y, -camera_z);
         matrix_set_perspective_projection(projection, 3.14f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
         matrix_multiply_3(matrix, projection, view, model);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
 

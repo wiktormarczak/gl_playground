@@ -1,5 +1,6 @@
 #include <gl_playground/matrix.h>
 #include <math.h>
+#include <string.h>
 
 void matrix_set_identity(float matrix[])
 {
@@ -28,6 +29,34 @@ void matrix_multiply_3(float matrix[], float a[], float b[], float c[])
     float ab[16];
     matrix_multiply(ab, a, b);
     matrix_multiply(matrix, ab, c);
+}
+
+void matrix_transform(float matrix[], float transformation[])
+{
+    float copy[16];
+    memcpy(copy, matrix, 16 * sizeof(float));
+    matrix_multiply(matrix, transformation, copy);
+}
+
+void matrix_scale(float matrix[], float x, float y, float z)
+{
+    float scaling[16];
+    matrix_set_scaling(scaling, x, y, z);
+    matrix_transform(matrix, scaling);
+}
+
+void matrix_translate(float matrix[], float x, float y, float z)
+{
+    float translation[16];
+    matrix_set_translation(translation, x, y, z);
+    matrix_transform(matrix, translation);
+}
+
+void matrix_rotate(float matrix[], float x, float y, float z)
+{
+    float rotation[16];
+    matrix_set_rotation(rotation, x, y, z);
+    matrix_transform(matrix, rotation);
 }
 
 void matrix_set_scaling(float matrix[], float x, float y, float z)
