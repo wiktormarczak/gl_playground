@@ -114,20 +114,46 @@ void game_run(Game *game)
 
     glBindVertexArray(0);
 
+    const bool *keyboard = SDL_GetKeyboardState(NULL);
+    float camera_x = 0.0f, camera_y = 0.0f, camera_z = 0.0f;
+
+    float prev_time = SDL_GetTicks(), delta_time = 0.0f;
+
     bool open = true;
     while(open)
     {
+        // Input
         SDL_Event event;
         while(SDL_PollEvent(&event))
             if(event.type == SDL_EVENT_QUIT)
                 open = false;
 
+        if(keyboard[SDL_SCANCODE_A])
+            camera_x -= delta_time * 0.001f;
+
+        if(keyboard[SDL_SCANCODE_D])
+            camera_x += delta_time * 0.001f;
+
+        if(keyboard[SDL_SCANCODE_LCTRL])
+            camera_y -= delta_time * 0.001f;
+
+        if(keyboard[SDL_SCANCODE_SPACE])
+            camera_y += delta_time * 0.001f;
+
+        if(keyboard[SDL_SCANCODE_S])
+            camera_z -= delta_time * 0.001f;
+
+        if(keyboard[SDL_SCANCODE_W])
+            camera_z += delta_time * 0.001f;
+
+        // Render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader_program);
 
-        matrix_set_rotation_z(matrix, SDL_GetTicks() / 1000.0f);
+        // matrix_set_rotation_z(matrix, SDL_GetTicks() / 1000.0f);
+        matrix_set_translation(matrix, -camera_x, -camera_y, -camera_z);
         glUniformMatrix4fv(uniform_matrix_location, 1, true, matrix);
 
         glBindVertexArray(vao[0]);
@@ -136,6 +162,10 @@ void game_run(Game *game)
         glBindVertexArray(0);
 
         SDL_GL_SwapWindow(game->window);
+
+        float curr_time = SDL_GetTicks();
+        delta_time = curr_time - prev_time;
+        prev_time = curr_time;
     }
 }
 
