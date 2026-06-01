@@ -10,6 +10,24 @@ void matrix_set_identity(float matrix[])
         matrix[i] = 1.0f;
 }
 
+void matrix_set_scaling(float matrix[], float x, float y, float z)
+{
+    matrix_set_identity(matrix);
+
+    matrix[0] = x;
+    matrix[5] = y;
+    matrix[10] = z;
+}
+
+void matrix_set_translation(float matrix[], float x, float y, float z)
+{
+    matrix_set_identity(matrix);
+
+    matrix[3] = x;
+    matrix[7] = y;
+    matrix[11] = z;
+}
+
 void matrix_set_rotation_x(float matrix[], float theta)
 {
     matrix_set_identity(matrix);
