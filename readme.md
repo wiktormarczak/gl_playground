@@ -14,3 +14,6 @@ bin/app
 ```
 
 App needs to be run from the main project directory in order to work.
+
+## License
+This program is released under license GNU GPL version 3.
