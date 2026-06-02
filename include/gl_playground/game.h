@@ -1,13 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <gl_playground/window.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 
 typedef struct
 {
-    SDL_Window *window;
-    SDL_GLContext context;
+    Window *window;
     bool open;
 
     unsigned int shader_program, uniform_matrix_location;

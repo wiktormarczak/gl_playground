@@ -1,4 +1,5 @@
 #include <gl_playground/game.h>
+#include <gl_playground/window.h>
 #include <gl_playground/shaders.h>
 #include <gl_playground/matrix.h>
 #include <glad/gl.h>
@@ -10,48 +11,9 @@ Game *game_create()
 {
     Game *game = malloc(sizeof(Game));
 
-    if(!SDL_Init(SDL_INIT_VIDEO))
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not initialize SDL: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    game->window = SDL_CreateWindow("GL Playground", 800, 600, SDL_WINDOW_OPENGL);
+    game->window = window_create("GL Playground", 800, 600);
     if(game->window == NULL)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create a window: %s\n", SDL_GetError());
         return NULL;
-    }
-
-    game->context = SDL_GL_CreateContext(game->window);
-    if(game->context == NULL)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create an OpenGL context: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    if(!SDL_GL_MakeCurrent(game->window, game->context))
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not make OpenGL context current: %s\n", SDL_GetError());
-        return NULL;
-    }
-
-    if(!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress))
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not initialize OpenGL context.\n");
-        return NULL;
-    }
-
-    glViewport(0, 0, 800, 600);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    SDL_SetWindowRelativeMouseMode(game->window, true);
 
     game->open = true;
 
@@ -194,15 +156,12 @@ void game_draw(Game *game)
 
     glBindVertexArray(0);
 
-    SDL_GL_SwapWindow(game->window);
+    window_refresh(game->window);
 }
 
 void game_destroy(Game *game)
 {
-    SDL_GL_DestroyContext(game->context);
-    SDL_DestroyWindow(game->window);
-    SDL_Quit();
+    window_destroy(game->window);
 
     game->window = NULL;
-    game->context = NULL;
 }
