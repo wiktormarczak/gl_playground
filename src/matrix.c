@@ -11,54 +11,6 @@ void matrix_set_identity(float matrix[])
         matrix[i] = 1.0f;
 }
 
-void matrix_multiply(float matrix[], float left[], float right[])
-{
-    for(int i = 0; i < 4; i++)
-    {
-        for(int j = 0; j < 4; j++)
-        {
-            matrix[4 * i + j] = 0.0f;
-            for(int k = 0; k < 4; k++)
-                matrix[4 * i + j] += left[4 * i + k] * right[4 * k + j];
-        }
-    }
-}
-
-void matrix_multiply_3(float matrix[], float a[], float b[], float c[])
-{
-    float ab[16];
-    matrix_multiply(ab, a, b);
-    matrix_multiply(matrix, ab, c);
-}
-
-void matrix_transform(float matrix[], float transformation[])
-{
-    float copy[16];
-    memcpy(copy, matrix, 16 * sizeof(float));
-    matrix_multiply(matrix, transformation, copy);
-}
-
-void matrix_scale(float matrix[], float x, float y, float z)
-{
-    float scaling[16];
-    matrix_set_scaling(scaling, x, y, z);
-    matrix_transform(matrix, scaling);
-}
-
-void matrix_translate(float matrix[], float x, float y, float z)
-{
-    float translation[16];
-    matrix_set_translation(translation, x, y, z);
-    matrix_transform(matrix, translation);
-}
-
-void matrix_rotate(float matrix[], float x, float y, float z)
-{
-    float rotation[16];
-    matrix_set_rotation(rotation, x, y, z);
-    matrix_transform(matrix, rotation);
-}
-
 void matrix_set_scaling(float matrix[], float x, float y, float z)
 {
     matrix_set_identity(matrix);
@@ -138,4 +90,52 @@ void matrix_set_perspective_projection(float matrix[], float fov, float aspect, 
     matrix[11] = -2.0f * far * near / (far - near);
     matrix[14] = -1.0f;
     matrix[15] = 0.0f;
+}
+
+void matrix_multiply(float matrix[], float left[], float right[])
+{
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            matrix[4 * i + j] = 0.0f;
+            for(int k = 0; k < 4; k++)
+                matrix[4 * i + j] += left[4 * i + k] * right[4 * k + j];
+        }
+    }
+}
+
+void matrix_multiply_3(float matrix[], float a[], float b[], float c[])
+{
+    float ab[16];
+    matrix_multiply(ab, a, b);
+    matrix_multiply(matrix, ab, c);
+}
+
+void matrix_transform(float matrix[], float transformation[])
+{
+    float copy[16];
+    memcpy(copy, matrix, 16 * sizeof(float));
+    matrix_multiply(matrix, transformation, copy);
+}
+
+void matrix_scale(float matrix[], float x, float y, float z)
+{
+    float scaling[16];
+    matrix_set_scaling(scaling, x, y, z);
+    matrix_transform(matrix, scaling);
+}
+
+void matrix_translate(float matrix[], float x, float y, float z)
+{
+    float translation[16];
+    matrix_set_translation(translation, x, y, z);
+    matrix_transform(matrix, translation);
+}
+
+void matrix_rotate(float matrix[], float x, float y, float z)
+{
+    float rotation[16];
+    matrix_set_rotation(rotation, x, y, z);
+    matrix_transform(matrix, rotation);
 }
