@@ -117,17 +117,18 @@ void game_update(Game *game, float delta_time)
             float xrel = event.motion.xrel;
             float yrel = event.motion.yrel;
 
-            camera_rotate(game->camera, 0.01f * yrel * delta_time, 0.01f * xrel * delta_time, 0.0f);
+            camera_adjust_pitch(game->camera, -0.01f * yrel * delta_time);
+            camera_adjust_yaw(game->camera, -0.01f * xrel * delta_time);
         }
     }
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
 
     if(keyboard[SDL_SCANCODE_A])
-        camera_translate(game->camera, 0.001f * delta_time, 0.0f, 0.0f);
+        camera_move_horizontally(game->camera, 0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_D])
-        camera_translate(game->camera, -0.001f * delta_time, 0.0f, 0.0f);
+        camera_move_horizontally(game->camera, -0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_LCTRL])
         camera_translate(game->camera, 0.0f, 0.001f * delta_time, 0.0f);
@@ -136,25 +137,37 @@ void game_update(Game *game, float delta_time)
         camera_translate(game->camera, 0.0f, -0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_W])
-        camera_translate(game->camera, 0.0f, 0.0f, 0.001f * delta_time);
+        camera_move_horizontally(game->camera, -0.0f, -0.001f * delta_time);
 
     if(keyboard[SDL_SCANCODE_S])
-        camera_translate(game->camera, 0.0f, 0.0f, -0.001f * delta_time);
+        camera_move_horizontally(game->camera, 0.0f, 0.001f * delta_time);
+
+    if(keyboard[SDL_SCANCODE_UP])
+        camera_adjust_pitch(game->camera, 0.001f * delta_time);
+
+    if(keyboard[SDL_SCANCODE_DOWN])
+        camera_adjust_pitch(game->camera, -0.001f * delta_time);
+
+    if(keyboard[SDL_SCANCODE_LEFT])
+        camera_adjust_yaw(game->camera, 0.001f * delta_time);
+
+    if(keyboard[SDL_SCANCODE_RIGHT])
+        camera_adjust_yaw(game->camera, -0.001f * delta_time);
 }
 
 void game_draw(Game *game)
 {
+    camera_update(game->camera);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float grid_matrix[16];
-    matrix_multiply(grid_matrix, game->camera->projection, game->camera->view);
-    grid_draw(game->grid, grid_matrix);
+    grid_draw(game->grid, game->camera->matrix);
 
     glUseProgram(game->shader_program);
 
     matrix_set_rotation_x(game->model, SDL_GetTicks() / 1000.0f);
-    matrix_multiply_3(game->matrix, game->camera->projection, game->camera->view, game->model);
+    matrix_multiply(game->matrix, game->camera->matrix, game->model);
     glUniformMatrix4fv(game->uniform_matrix_location, 1, true, game->matrix);
 
     glBindVertexArray(game->vao[0]);
