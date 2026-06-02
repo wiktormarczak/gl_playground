@@ -1,0 +1,7 @@
+#version 460
+layout (location = 0) in vec3 attribute_position;
+
+void main()
+{
+    gl_Position = vec4(attribute_position, 1.0);
+}

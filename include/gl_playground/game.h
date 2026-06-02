@@ -2,12 +2,14 @@
 #define GAME_H
 
 #include <gl_playground/window.h>
+#include <gl_playground/grid.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 
 typedef struct
 {
     Window *window;
+    Grid *grid;
     bool open;
 
     unsigned int shader_program, uniform_matrix_location;

@@ -2,6 +2,7 @@
 #include <gl_playground/window.h>
 #include <gl_playground/shader.h>
 #include <gl_playground/matrix.h>
+#include <gl_playground/grid.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 #include <stdbool.h>
@@ -14,6 +15,8 @@ Game *game_create()
     game->window = window_create("GL Playground", 800, 600);
     if(game->window == NULL)
         return NULL;
+
+    game->grid = grid_create();
 
     game->open = true;
 
@@ -144,6 +147,8 @@ void game_draw(Game *game)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    grid_draw(game->grid);
+
     glUseProgram(game->shader_program);
 
     matrix_set_rotation_x(game->model, SDL_GetTicks() / 1000.0f);
@@ -162,6 +167,8 @@ void game_draw(Game *game)
 void game_destroy(Game *game)
 {
     window_destroy(game->window);
-
     game->window = NULL;
+
+    grid_destroy(game->grid);
+    game->grid = NULL;
 }
