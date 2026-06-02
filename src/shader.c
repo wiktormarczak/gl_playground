@@ -1,13 +1,13 @@
-#include <gl_playground/shaders.h>
+#include <gl_playground/shader.h>
 #include <glad/gl.h>
 #include <SDL3/SDL_log.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-unsigned int get_shader_program(const char *vertex_shader_path, const char *fragment_shader_path)
+unsigned int shader_create_program(const char *vertex_shader_path, const char *fragment_shader_path)
 {
-    unsigned int vertex_shader = get_vertex_shader(vertex_shader_path);
-    unsigned int fragment_shader = get_fragment_shader(fragment_shader_path);
+    unsigned int vertex_shader = shader_create_vertex(vertex_shader_path);
+    unsigned int fragment_shader = shader_create_fragment(fragment_shader_path);
 
     unsigned int shader_program = glCreateProgram();
 
@@ -32,19 +32,19 @@ unsigned int get_shader_program(const char *vertex_shader_path, const char *frag
     return shader_program;
 }
 
-unsigned int get_vertex_shader(const char *shader_path)
+unsigned int shader_create_vertex(const char *shader_path)
 {
-    return get_shader(shader_path, GL_VERTEX_SHADER);
+    return shader_create(shader_path, GL_VERTEX_SHADER);
 }
 
-unsigned int get_fragment_shader(const char *shader_path)
+unsigned int shader_create_fragment(const char *shader_path)
 {
-    return get_shader(shader_path, GL_FRAGMENT_SHADER);
+    return shader_create(shader_path, GL_FRAGMENT_SHADER);
 }
 
-unsigned int get_shader(const char *shader_path, unsigned int shader_type)
+unsigned int shader_create(const char *shader_path, unsigned int shader_type)
 {
-    char *source = get_source(shader_path);
+    char *source = shader_get_source(shader_path);
 
     unsigned int shader = glCreateShader(shader_type);
     glShaderSource(shader, 1, (const char **)&source, NULL);
@@ -65,7 +65,7 @@ unsigned int get_shader(const char *shader_path, unsigned int shader_type)
     return shader;
 }
 
-char *get_source(const char *shader_path)
+char *shader_get_source(const char *shader_path)
 {
     FILE *file = fopen(shader_path, "rb");
 

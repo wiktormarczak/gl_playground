@@ -1,6 +1,6 @@
 #include <gl_playground/game.h>
 #include <gl_playground/window.h>
-#include <gl_playground/shaders.h>
+#include <gl_playground/shader.h>
 #include <gl_playground/matrix.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
@@ -17,7 +17,7 @@ Game *game_create()
 
     game->open = true;
 
-    game->shader_program = get_shader_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
+    game->shader_program = shader_create_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
     game->uniform_matrix_location = glGetUniformLocation(game->shader_program, "uniform_matrix");
 
     matrix_set_translation(game->view, 0.0f, 0.0f, -1.0f);
