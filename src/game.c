@@ -18,12 +18,12 @@ Game *game_create()
 
     game->grid = grid_create();
 
+    game->camera = camera_create();
+
     game->open = true;
 
     game->shader_program = shader_create_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
     game->uniform_matrix_location = glGetUniformLocation(game->shader_program, "uniform_matrix");
-
-    matrix_set_translation(game->view, 0.0f, 0.0f, -1.0f);
 
     // Vertex Data
     float vertex_data[] = {
@@ -117,29 +117,29 @@ void game_update(Game *game, float delta_time)
             float xrel = event.motion.xrel;
             float yrel = event.motion.yrel;
 
-            matrix_rotate(game->view, 0.01f * yrel * delta_time, 0.01f * xrel * delta_time, 0.0f);
+            camera_rotate(game->camera, 0.01f * yrel * delta_time, 0.01f * xrel * delta_time, 0.0f);
         }
     }
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
 
     if(keyboard[SDL_SCANCODE_A])
-        matrix_translate(game->view, 0.001f * delta_time, 0.0f, 0.0f);
+        camera_translate(game->camera, 0.001f * delta_time, 0.0f, 0.0f);
 
     if(keyboard[SDL_SCANCODE_D])
-        matrix_translate(game->view, -0.001f * delta_time, 0.0f, 0.0f);
+        camera_translate(game->camera, -0.001f * delta_time, 0.0f, 0.0f);
 
     if(keyboard[SDL_SCANCODE_LCTRL])
-        matrix_translate(game->view, 0.0f, 0.001f * delta_time, 0.0f);
+        camera_translate(game->camera, 0.0f, 0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_SPACE])
-        matrix_translate(game->view, 0.0f, -0.001f * delta_time, 0.0f);
+        camera_translate(game->camera, 0.0f, -0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_W])
-        matrix_translate(game->view, 0.0f, 0.0f, 0.001f * delta_time);
+        camera_translate(game->camera, 0.0f, 0.0f, 0.001f * delta_time);
 
     if(keyboard[SDL_SCANCODE_S])
-        matrix_translate(game->view, 0.0f, 0.0f, -0.001f * delta_time);
+        camera_translate(game->camera, 0.0f, 0.0f, -0.001f * delta_time);
 }
 
 void game_draw(Game *game)
@@ -148,14 +148,13 @@ void game_draw(Game *game)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     float grid_matrix[16];
-    matrix_multiply(grid_matrix, game->projection, game->view);
+    matrix_multiply(grid_matrix, game->camera->projection, game->camera->view);
     grid_draw(game->grid, grid_matrix);
 
     glUseProgram(game->shader_program);
 
     matrix_set_rotation_x(game->model, SDL_GetTicks() / 1000.0f);
-    matrix_set_perspective_projection(game->projection, 3.14f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
-    matrix_multiply_3(game->matrix, game->projection, game->view, game->model);
+    matrix_multiply_3(game->matrix, game->camera->projection, game->camera->view, game->model);
     glUniformMatrix4fv(game->uniform_matrix_location, 1, true, game->matrix);
 
     glBindVertexArray(game->vao[0]);
@@ -173,4 +172,7 @@ void game_destroy(Game *game)
 
     grid_destroy(game->grid);
     game->grid = NULL;
+
+    camera_destroy(game->camera);
+    game->camera;
 }
