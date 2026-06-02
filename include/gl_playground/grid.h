@@ -3,13 +3,13 @@
 
 typedef struct
 {
-    unsigned int shader_program;
+    unsigned int shader_program, uniform_matrix_location;
     unsigned int vertex_buffer, vertex_array;
 } Grid;
 
 Grid *grid_create();
 void grid_destroy(Grid *grid);
 
-void grid_draw(Grid *grid);
+void grid_draw(Grid *grid, float camera_matrix[]);
 
 #endif

@@ -147,7 +147,9 @@ void game_draw(Game *game)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    grid_draw(game->grid);
+    float grid_matrix[16];
+    matrix_multiply(grid_matrix, game->projection, game->view);
+    grid_draw(game->grid, grid_matrix);
 
     glUseProgram(game->shader_program);
 
