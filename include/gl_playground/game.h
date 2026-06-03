@@ -14,7 +14,7 @@ typedef struct
     Camera *camera;
     bool open;
 
-    unsigned int shader_program, uniform_matrix_location;
+    unsigned int shader_program, view_matrix_location, projection_matrix_location;
     float model[16], matrix[16];
     unsigned int vbo[1], ebo[1], vao[1];
 } Game;

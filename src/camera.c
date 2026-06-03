@@ -2,18 +2,29 @@
 #include <gl_playground/matrix.h>
 #include <gl_playground/vector.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+struct Camera
+{
+    float view_matrix[16], projection_matrix[16];
+    float x, y, z, pitch, yaw;
+    float fov, aspect, near, far;
+};
 
 Camera *camera_create()
 {
     Camera *camera = malloc(sizeof(Camera));
 
-    camera->rotation_vector[0] = 0.0f;
-    camera->rotation_vector[1] = 0.0f;
-    camera->rotation_vector[2] = 0.0f;
-
-    matrix_set_translation(camera->translation_matrix, 0.0f, 0.0f, -1.0f);
-    matrix_set_identity(camera->rotation_matrix);
-    matrix_set_perspective_projection(camera->projection, 3.14f / 4.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+    camera->x = 0.0f;
+    camera->y = 0.0f;
+    camera->z = 0.0f;
+    camera->pitch = 0.0f;
+    camera->yaw = 0.0f;
+    camera->fov = M_PI / 4.0f;
+    camera->aspect = 4.0f / 3.0f;
+    camera->near = 0.1f;
+    camera->far = 100.0f;
 
     return camera;
 }
@@ -23,55 +34,44 @@ void camera_destroy(Camera *camera)
     free(camera);
 }
 
-void camera_move_horizontally(Camera *camera, float x, float z)
+void camera_move(Camera *camera, float x, float y, float z)
 {
-    float direction[4];
-    direction[0] = x;
-    direction[1] = 0.0f;
-    direction[2] = z;
-    direction[3] = 1.0f;
-
-    vector_transform(direction, camera->rotation_matrix);
-    direction[1] = 0.0f;
-    direction[2] = -direction[2]; // ???
-
-    camera->translation_vector[0] += direction[0];
-    camera->translation_vector[1] += direction[1];
-    camera->translation_vector[2] += direction[2];
+    camera->x += x * cos(camera->yaw) + z * sin(camera->yaw);
+    camera->y += y;
+    camera->z += -x * sin(camera->yaw) + z * cos(camera->yaw);
 }
 
-void camera_adjust_pitch(Camera *camera, float angle)
+void camera_turn(Camera *camera, float pitch, float yaw)
 {
-    camera->rotation_vector[0] -= angle;
+    camera->pitch += pitch;
+    camera->yaw += yaw;
 
-    if(camera->rotation_vector[0] > 3.14f / 2.0f)
-        camera->rotation_vector[0] = 3.14f / 2.0f;
-
-    if(camera->rotation_vector[0] < -3.14f / 2.0f)
-        camera->rotation_vector[0] = -3.14f / 2.0f;
+    if(pitch > M_PI / 2.0f)
+        pitch = M_PI / 2.0f;
+    if(pitch < -M_PI / 2.0f)
+        pitch = -M_PI / 2.0f;
 }
 
-void camera_adjust_yaw(Camera *camera, float angle)
+void camera_zoom(Camera *camera, float factor)
 {
-    camera->rotation_vector[1] -= angle;
-}
-
-void camera_translate(Camera *camera, float x, float y, float z)
-{
-    camera->translation_vector[0] += x;
-    camera->translation_vector[1] += y;
-    camera->translation_vector[2] += z;
-}
-
-void camera_rotate(Camera *camera, float x, float y, float z)
-{
-    matrix_rotate(camera->rotation_matrix, x, y, z);
+    camera->fov *= factor;
 }
 
 void camera_update(Camera *camera)
 {
-    matrix_set_translation(camera->translation_matrix, camera->translation_vector[0], camera->translation_vector[1], camera->translation_vector[2]);
-    matrix_set_rotation(camera->rotation_matrix, camera->rotation_vector[0], camera->rotation_vector[1], camera->rotation_vector[2]);
-    matrix_multiply(camera->view, camera->rotation_matrix, camera->translation_matrix);
-    matrix_multiply(camera->matrix, camera->projection, camera->view);
+    matrix_set_identity(camera->view_matrix);
+    matrix_translate(camera->view_matrix, -camera->x, -camera->y, -camera->z);
+    matrix_rotate(camera->view_matrix, -camera->pitch, -camera->yaw, 0.0f);
+
+    matrix_set_perspective_projection(camera->projection_matrix, camera->fov, camera->aspect, camera->near, camera->far);
+}
+
+void camera_get_view_matrix(Camera *camera, float view_matrix[16])
+{
+    memcpy(view_matrix, camera->view_matrix, 16 * sizeof(float));
+}
+
+void camera_get_projection_matrix(Camera *camera, float projection_matrix[16])
+{
+    memcpy(projection_matrix, camera->projection_matrix, 16 * sizeof(float));
 }

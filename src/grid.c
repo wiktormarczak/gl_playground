@@ -8,7 +8,8 @@ Grid *grid_create()
     Grid *grid = malloc(sizeof(Grid));
 
     grid->shader_program = shader_create_program("glsl/grid_vertex_shader.glsl", "glsl/grid_fragment_shader.glsl");
-    grid->uniform_matrix_location = glGetUniformLocation(grid->shader_program, "uniform_matrix");
+    grid->view_matrix_location = glGetUniformLocation(grid->shader_program, "view");
+    grid->projection_matrix_location = glGetUniformLocation(grid->shader_program, "projection");
 
     const float grid_size = 10.0f;
     float vertex_data[] = {
@@ -43,10 +44,11 @@ void grid_destroy(Grid *grid)
     grid = NULL;
 }
 
-void grid_draw(Grid *grid, float camera_matrix[])
+void grid_draw(Grid *grid, float view_matrix[], float projection_matrix[])
 {
     glUseProgram(grid->shader_program);
-    glUniformMatrix4fv(grid->uniform_matrix_location, 1, true, camera_matrix);
+    glUniformMatrix4fv(grid->view_matrix_location, 1, true, view_matrix);
+    glUniformMatrix4fv(grid->projection_matrix_location, 1, true, projection_matrix);
     glBindVertexArray(grid->vertex_array);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);

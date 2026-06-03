@@ -23,7 +23,8 @@ Game *game_create()
     game->open = true;
 
     game->shader_program = shader_create_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
-    game->uniform_matrix_location = glGetUniformLocation(game->shader_program, "uniform_matrix");
+    game->view_matrix_location = glGetUniformLocation(game->shader_program, "view");
+    game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
 
     // Vertex Data
     float vertex_data[] = {
@@ -117,63 +118,58 @@ void game_update(Game *game, float delta_time)
             float xrel = event.motion.xrel;
             float yrel = event.motion.yrel;
 
-            camera_adjust_pitch(game->camera, -0.01f * yrel * delta_time);
-            camera_adjust_yaw(game->camera, -0.01f * xrel * delta_time);
+            camera_turn(game->camera, -0.01f * yrel, -0.01 * xrel);
+        }
+
+        if(event.type == SDL_EVENT_MOUSE_WHEEL)
+        {
+            float y = event.wheel.y;
+            camera_zoom(game->camera, 1.0f - y * 0.02f);
         }
     }
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
 
     if(keyboard[SDL_SCANCODE_A])
-        camera_move_horizontally(game->camera, 0.001f * delta_time, 0.0f);
+        camera_move(game->camera, -0.001f * delta_time, 0.0f, 0.0f);
 
     if(keyboard[SDL_SCANCODE_D])
-        camera_move_horizontally(game->camera, -0.001f * delta_time, 0.0f);
+        camera_move(game->camera, 0.001f * delta_time, 0.0f, 0.0f);
 
     if(keyboard[SDL_SCANCODE_LCTRL])
-        camera_translate(game->camera, 0.0f, 0.001f * delta_time, 0.0f);
+        camera_move(game->camera, 0.0f, -0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_SPACE])
-        camera_translate(game->camera, 0.0f, -0.001f * delta_time, 0.0f);
+        camera_move(game->camera, 0.0f, 0.001f * delta_time, 0.0f);
 
     if(keyboard[SDL_SCANCODE_W])
-        camera_move_horizontally(game->camera, -0.0f, -0.001f * delta_time);
+        camera_move(game->camera, 0.0f, 0.0f, -0.001f * delta_time);
 
     if(keyboard[SDL_SCANCODE_S])
-        camera_move_horizontally(game->camera, 0.0f, 0.001f * delta_time);
-
-    if(keyboard[SDL_SCANCODE_UP])
-        camera_adjust_pitch(game->camera, 0.001f * delta_time);
-
-    if(keyboard[SDL_SCANCODE_DOWN])
-        camera_adjust_pitch(game->camera, -0.001f * delta_time);
-
-    if(keyboard[SDL_SCANCODE_LEFT])
-        camera_adjust_yaw(game->camera, 0.001f * delta_time);
-
-    if(keyboard[SDL_SCANCODE_RIGHT])
-        camera_adjust_yaw(game->camera, -0.001f * delta_time);
+        camera_move(game->camera, 0.0f, 0.0f, 0.001f * delta_time);
 }
 
 void game_draw(Game *game)
 {
+    float view_matrix[16], projection_matrix[16];
     camera_update(game->camera);
+    camera_get_view_matrix(game->camera, view_matrix);
+    camera_get_projection_matrix(game->camera, projection_matrix);
+
+    matrix_set_rotation_x(game->model, SDL_GetTicks() / 1000.0f);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    grid_draw(game->grid, game->camera->matrix);
+    grid_draw(game->grid, view_matrix, projection_matrix);
 
     glUseProgram(game->shader_program);
 
-    matrix_set_rotation_x(game->model, SDL_GetTicks() / 1000.0f);
-    matrix_multiply(game->matrix, game->camera->matrix, game->model);
-    glUniformMatrix4fv(game->uniform_matrix_location, 1, true, game->matrix);
+    glUniformMatrix4fv(game->view_matrix_location, 1, true, view_matrix);
+    glUniformMatrix4fv(game->projection_matrix_location, 1, true, projection_matrix);
 
     glBindVertexArray(game->vao[0]);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
 
     window_refresh(game->window);
 }
