@@ -16,6 +16,7 @@ Window *window_create(const char *title, unsigned int width, unsigned int height
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
 
     window->window = SDL_CreateWindow(title, width, height, SDL_WINDOW_OPENGL);
     if(window->window == NULL)
@@ -46,6 +47,7 @@ Window *window_create(const char *title, unsigned int width, unsigned int height
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_MULTISAMPLE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     SDL_SetWindowRelativeMouseMode(window->window, true);
