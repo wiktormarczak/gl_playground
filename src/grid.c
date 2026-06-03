@@ -11,12 +11,9 @@ Grid *grid_create()
     grid->view_matrix_location = glGetUniformLocation(grid->shader_program, "view");
     grid->projection_matrix_location = glGetUniformLocation(grid->shader_program, "projection");
 
-    const float grid_size = 10.0f;
     float vertex_data[] = {
-        grid_size, 0.0f, grid_size,
-        -grid_size, 0.0f, grid_size,
-        grid_size, 0.0f, -grid_size,
-        -grid_size, 0.0f, -grid_size
+        0.0f, 0.0f, -10.0f,
+        0.0f, 0.0f, 10.0f
     };
 
     glCreateBuffers(1, &grid->vertex_buffer);
@@ -32,6 +29,9 @@ Grid *grid_create()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    grid->count = 41;
+    grid->spacing = 1.0f;
+
     return grid;
 }
 
@@ -44,13 +44,14 @@ void grid_destroy(Grid *grid)
     grid = NULL;
 }
 
-void grid_draw(Grid *grid, float view_matrix[], float projection_matrix[])
+void grid_draw(Grid *grid, float view_matrix[], float projection_matrix[], float camera_x, float camera_y, float camera_z)
 {
     glUseProgram(grid->shader_program);
     glUniformMatrix4fv(grid->view_matrix_location, 1, true, view_matrix);
     glUniformMatrix4fv(grid->projection_matrix_location, 1, true, projection_matrix);
-    glBindVertexArray(grid->vertex_array);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+    glUniform1ui(glGetUniformLocation(grid->shader_program, "count"), grid->count);
+    glUniform1f(glGetUniformLocation(grid->shader_program, "spacing"), grid->spacing);
+    glUniform3f(glGetUniformLocation(grid->shader_program, "camera_position"), camera_x, camera_y, camera_z);
+    glDrawArrays(GL_LINES, 0, 4 * grid->count);
     glUseProgram(0);
 }

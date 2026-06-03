@@ -46,10 +46,10 @@ void camera_turn(Camera *camera, float pitch, float yaw)
     camera->pitch += pitch;
     camera->yaw += yaw;
 
-    if(pitch > M_PI / 2.0f)
-        pitch = M_PI / 2.0f;
-    if(pitch < -M_PI / 2.0f)
-        pitch = -M_PI / 2.0f;
+    if(camera->pitch > M_PI / 2.0f)
+        camera->pitch = M_PI / 2.0f;
+    if(camera->pitch < -M_PI / 2.0f)
+        camera->pitch = -M_PI / 2.0f;
 }
 
 void camera_zoom(Camera *camera, float factor)
@@ -64,6 +64,21 @@ void camera_update(Camera *camera)
     matrix_rotate(camera->view_matrix, -camera->pitch, -camera->yaw, 0.0f);
 
     matrix_set_perspective_projection(camera->projection_matrix, camera->fov, camera->aspect, camera->near, camera->far);
+}
+
+float camera_get_x(Camera *camera)
+{
+    return camera->x;
+}
+
+float camera_get_y(Camera *camera)
+{
+    return camera->y;
+}
+
+float camera_get_z(Camera *camera)
+{
+    return camera->z;
 }
 
 void camera_get_view_matrix(Camera *camera, float view_matrix[16])

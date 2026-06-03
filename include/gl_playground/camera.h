@@ -12,6 +12,9 @@ void camera_zoom(Camera *camera, float factor);
 
 void camera_update(Camera *camera);
 
+float camera_get_x(Camera *camera);
+float camera_get_y(Camera *camera);
+float camera_get_z(Camera *camera);
 void camera_get_view_matrix(Camera *camera, float view_matrix[16]);
 void camera_get_projection_matrix(Camera *camera, float view_matrix[16]);
 

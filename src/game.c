@@ -161,8 +161,6 @@ void game_draw(Game *game)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    grid_draw(game->grid, view_matrix, projection_matrix);
-
     glUseProgram(game->shader_program);
 
     glUniformMatrix4fv(game->view_matrix_location, 1, true, view_matrix);
@@ -170,6 +168,11 @@ void game_draw(Game *game)
 
     glBindVertexArray(game->vao[0]);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    float camera_x = camera_get_x(game->camera);
+    float camera_y = camera_get_y(game->camera);
+    float camera_z = camera_get_z(game->camera);
+    grid_draw(game->grid, view_matrix, projection_matrix, camera_x, camera_y, camera_z);
 
     window_refresh(game->window);
 }
