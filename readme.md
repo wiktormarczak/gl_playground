@@ -1,16 +1,15 @@
 # GL Playground
 A project for me to help me learn programming in C, OpenGL and SDL3.
 
-## Requirments
-* `gcc` (if you want to use another C compiler, edit the Makefile)
-* `make`
-* SDL3 installed systemwide
-
-## Building And Running
+## Building and Running
+App uses CMake as its build system. The executable must be run from the project's root directory in order to work.
 ```
-mkdir bin
+mkdir build
+cmake -S . -B build
+cd build
 make
-bin/app
+cd ..
+build/gl_playground
 ```
 
 App needs to be run from the main project directory in order to work.
