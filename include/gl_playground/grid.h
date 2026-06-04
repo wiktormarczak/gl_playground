@@ -5,7 +5,6 @@ typedef struct
 {
     unsigned int shader_program;
     unsigned int view_matrix_location, projection_matrix_location;
-    unsigned int vertex_buffer, vertex_array;
 
     unsigned int count;
     float spacing;
