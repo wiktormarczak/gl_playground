@@ -8,7 +8,7 @@ Grid *grid_create()
 {
     Grid *grid = malloc(sizeof(Grid));
 
-    grid->shader_program = shader_create_program("glsl/grid_vertex_shader.glsl", "glsl/grid_fragment_shader.glsl");
+    grid->shader_program = shader_create_program("res/glsl/grid_vertex_shader.glsl", "res/glsl/grid_fragment_shader.glsl");
     grid->view_matrix_location = glGetUniformLocation(grid->shader_program, "view");
     grid->projection_matrix_location = glGetUniformLocation(grid->shader_program, "projection");
 

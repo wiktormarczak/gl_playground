@@ -4,6 +4,7 @@
 #include <gl_playground/matrix.h>
 #include <gl_playground/grid.h>
 #include <glad/gl.h>
+#include <SDL3_image/SDL_image.h>
 #include <SDL3/SDL.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -22,47 +23,47 @@ Game *game_create()
 
     game->open = true;
 
-    game->shader_program = shader_create_program("glsl/vertex_shader.glsl", "glsl/fragment_shader.glsl");
+    game->shader_program = shader_create_program("res/glsl/vertex_shader.glsl", "res/glsl/fragment_shader.glsl");
     game->view_matrix_location = glGetUniformLocation(game->shader_program, "view");
     game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
 
     // Vertex Data
     float vertex_data[] = {
         // Front
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+         1.0f,  1.0f,  1.0f,     0.0f,  0.0f,  1.0f,     1.0f, 1.0f,
+        -1.0f,  1.0f,  1.0f,     0.0f,  0.0f,  1.0f,     0.0f, 1.0f,
+        -1.0f, -1.0f,  1.0f,     0.0f,  0.0f,  1.0f,     0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f,     0.0f,  0.0f,  1.0f,     1.0f, 0.0f,
 
         // Right
-        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, -1.0f,
 
         // Back
-        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, -1.0f,
 
         // Left
-        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-        -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f,
 
         // Top
-        1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, -1.0f,
+        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f,
 
         // Bottom
-        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f
+        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, -1.0f
     };
 
     unsigned int index_data[] = {
@@ -108,17 +109,27 @@ Game *game_create()
 
     glBindBuffer(GL_ARRAY_BUFFER, game->vbo[0]);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, game->ebo[0]);
 
     glBindVertexArray(0);
+
+    // Texture
+    SDL_Surface *surface = IMG_Load("res/img/tux.jpg");
+    glGenTextures(1, game->texture);
+    glBindTexture(GL_TEXTURE_2D, game->texture[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    SDL_DestroySurface(surface);
 
     return game;
 }

@@ -16,7 +16,7 @@ typedef struct
 
     unsigned int shader_program, view_matrix_location, projection_matrix_location;
     float model[16], matrix[16];
-    unsigned int vbo[1], ebo[1], vao[1];
+    unsigned int vbo[1], ebo[1], vao[1], texture[1];
 } Game;
 
 Game *game_create();
