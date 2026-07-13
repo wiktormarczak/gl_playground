@@ -2,14 +2,13 @@
 A project for me to help me learn programming in C, OpenGL and SDL3.
 
 ## Building and Running
-App uses CMake as its build system. The executable must be run from the project's root directory in order to work.
+App uses CMake as its build system.
 ```
 mkdir build
 cmake -S . -B build
 cd build
 make
-cd ..
-build/gl_playground
+./gl_playground
 ```
 
 ## License

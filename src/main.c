@@ -1,4 +1,5 @@
 #include <gl_playground/game.h>
+#include <SDL3/SDL_main.h>
 #include <stddef.h>
 
 int main()

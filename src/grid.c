@@ -1,6 +1,7 @@
 #include <gl_playground/grid.h>
 #include <gl_playground/shader.h>
 #include <glad/gl.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 Grid *grid_create()

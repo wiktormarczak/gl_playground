@@ -130,6 +130,9 @@ void game_update(Game *game, float delta_time)
 
     const bool *keyboard = SDL_GetKeyboardState(NULL);
 
+    if(keyboard[SDL_SCANCODE_ESCAPE])
+        game->open = false;
+
     if(keyboard[SDL_SCANCODE_A])
         camera_move(game->camera, -0.001f * delta_time, 0.0f, 0.0f);
 
