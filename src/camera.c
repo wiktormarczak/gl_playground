@@ -21,7 +21,7 @@ Camera *camera_create()
     camera->z = 0.0f;
     camera->pitch = 0.0f;
     camera->yaw = 0.0f;
-    camera->fov = M_PI / 4.0f;
+    camera->fov = 3.14f / 4.0f;
     camera->aspect = 4.0f / 3.0f;
     camera->near = 0.1f;
     camera->far = 100.0f;
@@ -46,10 +46,10 @@ void camera_turn(Camera *camera, float pitch, float yaw)
     camera->pitch += pitch;
     camera->yaw += yaw;
 
-    if(camera->pitch > M_PI / 2.0f)
-        camera->pitch = M_PI / 2.0f;
-    if(camera->pitch < -M_PI / 2.0f)
-        camera->pitch = -M_PI / 2.0f;
+    if(camera->pitch > 3.14f / 2.0f)
+        camera->pitch = 3.14f / 2.0f;
+    if(camera->pitch < -3.14f / 2.0f)
+        camera->pitch = -3.14f / 2.0f;
 }
 
 void camera_zoom(Camera *camera, float factor)
