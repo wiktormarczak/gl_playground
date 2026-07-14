@@ -3,6 +3,7 @@
 #include <gl_playground/shader.h>
 #include <gl_playground/matrix.h>
 #include <gl_playground/grid.h>
+#include <gl_playground/mesh.h>
 #include <glad/gl.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3/SDL.h>
@@ -26,6 +27,8 @@ Game *game_create()
     game->shader_program = shader_create_program("res/glsl/vertex_shader.glsl", "res/glsl/fragment_shader.glsl");
     game->view_matrix_location = glGetUniformLocation(game->shader_program, "view");
     game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
+
+    game->cube = mesh_create_cube(1.0);
 
     // Vertex Data
     float vertex_data[] = {
@@ -214,8 +217,10 @@ void game_draw(Game *game)
     glUniformMatrix4fv(game->view_matrix_location, 1, true, view_matrix);
     glUniformMatrix4fv(game->projection_matrix_location, 1, true, projection_matrix);
 
-    glBindVertexArray(game->vao[0]);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    // glBindVertexArray(game->vao[0]);
+    // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    mesh_draw(game->cube);
 
     float camera_x = camera_get_x(game->camera);
     float camera_y = camera_get_y(game->camera);

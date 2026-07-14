@@ -4,6 +4,7 @@
 #include <gl_playground/window.h>
 #include <gl_playground/grid.h>
 #include <gl_playground/camera.h>
+#include <gl_playground/mesh.h>
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 
@@ -17,6 +18,8 @@ typedef struct
     unsigned int shader_program, view_matrix_location, projection_matrix_location;
     float model[16], matrix[16];
     unsigned int vbo[1], ebo[1], vao[1], texture[1];
+
+    Mesh *cube;
 } Game;
 
 Game *game_create();

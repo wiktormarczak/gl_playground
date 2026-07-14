@@ -1,7 +1,7 @@
 #version 460
 layout (location = 0) in vec3 attribute_position;
-layout (location = 1) in vec3 attribute_normal;
-layout (location = 2) in vec2 attribute_texture;
+layout (location = 1) in vec2 attribute_texture;
+layout (location = 2) in vec3 attribute_normal;
 
 out vec3 vertex_normal;
 out vec2 vertex_texture;
