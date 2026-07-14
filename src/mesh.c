@@ -1,5 +1,6 @@
 #include <gl_playground/mesh.h>
 #include <glad/gl.h>
+#include <SDL3/SDL_log.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -160,6 +161,96 @@ Mesh *mesh_create_cube(double size)
     for(int i = 0; i < 36; i++)
         mesh->index[i] = index[i];
 
+    mesh_gpu(mesh);
+
+    return mesh;
+}
+
+Mesh *mesh_load(const char *path)
+{
+    FILE *file = fopen(path, "r");
+
+    if(!file)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not open the object file %s.\n", path);
+        return NULL;
+    }
+
+    unsigned int position_count = 0, uv_count = 0, normal_count = 0;
+    double *position = NULL, *uv = NULL, *normal = NULL;
+
+    char line[128];
+    while(fgets(line, 128, file))
+    {
+        // if(line[0] == 'v' && line[1] == ' ')
+        // {
+        //     float x, y, z;
+        //     sscanf(line, "v %f %f %f\n", &x, &y, &z);
+        //     printf("Position: %f %f %f\n", x, y, z);
+        //
+        //     position_count++;
+        //     position = realloc(position, 3 * position_count * sizeof(double));
+        //     position[3 * position_count - 3] = x;
+        //     position[3 * position_count - 2] = y;
+        //     position[3 * position_count - 1] = z;
+        //     continue;
+        // }
+        //
+        // if(line[0] == 'v' && line[1] == 't')
+        // {
+        //     float u, v;
+        //     sscanf(line, "vt %f %f\n", &u, &v);
+        //     printf("UV: %f %f\n", u, v);
+        //
+        //     uv_count++;
+        //     uv = realloc(uv, 2 * uv_count * sizeof(double));
+        //     uv[2 * position_count - 2] = u;
+        //     uv[2 * position_count - 1] = v;
+        //     continue;
+        // }
+        //
+        // if(line[0] == 'v' && line[1] == 'n')
+        // {
+        //     float x, y, z;
+        //     sscanf(line, "vn %f %f %f\n", &x, &y, &z);
+        //     printf("Normal: %f %f\n", x, y, z);
+        //
+        //     normal_count++;
+        //     normal = realloc(normal, 3 * normal_count * sizeof(double));
+        //     normal[3 * position_count - 3] = x;
+        //     normal[3 * position_count - 2] = y;
+        //     normal[3 * position_count - 1] = z;
+        //     continue;
+        // }
+
+        printf("Line skipped!\n");
+    }
+
+    fclose(file);
+
+    free(position);
+    free(uv);
+    free(normal);
+
+    return NULL;
+}
+
+void mesh_destroy(Mesh *mesh)
+{
+    free(mesh->position);
+    free(mesh->uv);
+    free(mesh->normal);
+    free(mesh->index);
+
+    glDeleteBuffers(1, &mesh->position_vertex_buffer);
+    glDeleteBuffers(1, &mesh->uv_vertex_buffer);
+    glDeleteBuffers(1, &mesh->normal_vertex_buffer);
+    glDeleteBuffers(1, &mesh->index_buffer);
+    glDeleteVertexArrays(1, &mesh->vertex_array);
+}
+
+void mesh_gpu(Mesh *mesh)
+{
     glGenBuffers(1, &mesh->position_vertex_buffer);
     glGenBuffers(1, &mesh->uv_vertex_buffer);
     glGenBuffers(1, &mesh->normal_vertex_buffer);
@@ -169,26 +260,24 @@ Mesh *mesh_create_cube(double size)
     glBindVertexArray(mesh->vertex_array);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh->position_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * mesh->vertex_count * sizeof(double), mesh->position, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh->uv_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(uv), uv, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 2 * mesh->vertex_count * sizeof(double), mesh->uv, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 2, GL_DOUBLE, GL_FALSE, 2 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh->normal_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(normal), normal, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * mesh->vertex_count * sizeof(double), mesh->normal, GL_STATIC_DRAW);
     glVertexAttribPointer(2, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->index_buffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->index_count * sizeof(unsigned int), mesh->index, GL_STATIC_DRAW);
 
     glBindVertexArray(0);
-
-    return mesh;
 }
 
 void mesh_draw(Mesh *mesh)
