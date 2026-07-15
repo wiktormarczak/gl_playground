@@ -1,6 +1,11 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+typedef struct
+{
+    double x, y, z;
+} Vector;
+
 void vector_multiply_by_matrix(float dst[], float matrix[], float vector[]);
 void vector_transform(float vector[], float matrix[]);
 

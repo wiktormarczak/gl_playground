@@ -18,7 +18,7 @@ Camera *camera_create()
 
     camera->x = 0.0f;
     camera->y = 0.0f;
-    camera->z = 0.0f;
+    camera->z = 5.0f;
     camera->pitch = 0.0f;
     camera->yaw = 0.0f;
     camera->fov = 3.14f / 4.0f;

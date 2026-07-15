@@ -4,6 +4,7 @@
 #include <gl_playground/matrix.h>
 #include <gl_playground/grid.h>
 #include <gl_playground/mesh.h>
+#include <gl_playground/mesh_data.h>
 #include <glad/gl.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3/SDL.h>
@@ -29,7 +30,7 @@ Game *game_create()
     game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
 
     game->cube = mesh_create_cube(1.0);
-    Mesh *pyramid = mesh_load("res/obj/pyramid.obj");
+    MeshData pyramid = mesh_data_load("res/obj/pyramid.obj");
 
     // Texture
     SDL_Surface *surface = IMG_Load("res/img/tux.jpg");
