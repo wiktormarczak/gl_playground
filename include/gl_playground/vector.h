@@ -9,6 +9,7 @@ typedef struct
 Vector vector_get_diff(Vector left, Vector right);
 Vector vector_get_cross_product(Vector left, Vector right);
 double vector_get_dot_product(Vector left, Vector right);
+Vector vector_get_normalized(Vector vector);
 
 void vector_multiply_by_matrix(float dst[], float matrix[], float vector[]);
 void vector_transform(float vector[], float matrix[]);

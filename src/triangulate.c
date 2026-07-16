@@ -20,6 +20,8 @@ void triangulate(unsigned int vertex_count, Vector *vertex, Vector normal, unsig
     unsigned int prev = vertex_count - 1, curr = 0, next = 1;
     while(cut < vertex_count - 2)
     {
+        printf("Offset: %d\n", offset);
+
         if(condition(vertex_count, vertex, normal, prev, curr, next))
         {
             active[curr] = false;
@@ -45,9 +47,9 @@ static bool condition(unsigned int vertex_count, Vector *vertex, Vector normal, 
     Vector diff_left = vector_get_diff(vertex[curr], vertex[prev]);
     Vector diff_right = vector_get_diff(vertex[next], vertex[curr]);
     Vector breaking = vector_get_cross_product(diff_left, diff_right);
-    double breaking_direction = vector_get_dot_product(breaking, normal);
+    double breaking_direction = vector_get_dot_product(breaking, vector_get_normalized(normal));
 
-    if(breaking_direction < 0.0)
+    if(breaking_direction < -0.01)
         return false;
 
     for(int i = 0; i < vertex_count; i++)
@@ -63,7 +65,7 @@ static bool is_point_in_triangle(Vector point, Vector a, Vector b, Vector c)
     Vector bc = vector_get_diff(c, b);
     Vector ca = vector_get_diff(a, c);
 
-    Vector normal_triangle = vector_get_cross_product(ab, bc);
+    Vector normal_triangle = vector_get_normalized(vector_get_cross_product(ab, bc));
 
     Vector normal_ab = vector_get_cross_product(ab, normal_triangle);
     double value_ab = vector_get_dot_product(normal_ab, a);

@@ -30,7 +30,7 @@ Game *game_create()
     game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
 
     game->cube = mesh_create_cube(1.0);
-    game->pyramid = mesh_load("res/obj/e.obj");
+    game->pyramid = mesh_load("res/obj/mug.obj");
 
     // Texture
     SDL_Surface *surface = IMG_Load("res/img/marble.jpg");
