@@ -19,7 +19,7 @@ typedef struct
     float model[16], matrix[16];
     unsigned int vbo[1], ebo[1], vao[1], texture[1];
 
-    Mesh *cube;
+    Mesh *cube, *pyramid;
 } Game;
 
 Game *game_create();

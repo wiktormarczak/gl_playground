@@ -1,4 +1,7 @@
 #include <gl_playground/mesh.h>
+#include <gl_playground/vector.h>
+#include <gl_playground/uv.h>
+#include <gl_playground/mesh_data.h>
 #include <glad/gl.h>
 #include <SDL3/SDL_log.h>
 #include <stdio.h>
@@ -8,12 +11,15 @@ struct Mesh
 {
     unsigned int vertex_count, index_count;
 
-    double *position, *uv, *normal;
+    Vector *position, *normal;
+    UV *uv;
     unsigned int *index;
 
     unsigned int position_vertex_buffer, uv_vertex_buffer, normal_vertex_buffer, index_buffer;
     unsigned int vertex_array;
 };
+
+static void triangulate(Vector *position, unsigned int left, unsigned int right, unsigned int *index_dst);
 
 Mesh *mesh_create_cube(double size)
 {
@@ -144,25 +150,73 @@ Mesh *mesh_create_cube(double size)
     mesh->vertex_count = 24;
     mesh->index_count = 36;
 
-    mesh->position = malloc(24 * 3 * sizeof(double));
-    mesh->uv = malloc(24 * 2 * sizeof(double));
-    mesh->normal = malloc(24 * 3 * sizeof(double));
+    mesh->position = malloc(24 * sizeof(Vector));
+    mesh->uv = malloc(24 * sizeof(UV));
+    mesh->normal = malloc(24 * sizeof(Vector));
     mesh->index = malloc(36 * sizeof(unsigned int));
 
-    for(int i = 0; i < 24 * 3; i++)
-        mesh->position[i] = position[i];
+    for(int i = 0; i < 24; i++)
+    {
+        mesh->position[i].x = position[3 * i];
+        mesh->position[i].y = position[3 * i + 1];
+        mesh->position[i].z = position[3 * i + 2];
+    }
 
-    for(int i = 0; i < 24 * 2; i++)
-        mesh->uv[i] = uv[i];
+    for(int i = 0; i < 24; i++)
+    {
+        mesh->uv[i].u = uv[2 * i];
+        mesh->uv[i].v = uv[2 * i + 1];
+    }
 
-    for(int i = 0; i < 24 * 3; i++)
-        mesh->normal[i] = normal[i];
+    for(int i = 0; i < 24; i++)
+    {
+        mesh->normal[i].x = normal[3 * i];
+        mesh->normal[i].y = normal[3 * i + 1];
+        mesh->normal[i].z = normal[3 * i + 2];
+    }
 
     for(int i = 0; i < 36; i++)
         mesh->index[i] = index[i];
 
     mesh_gpu(mesh);
 
+    return mesh;
+}
+
+Mesh *mesh_load(const char *path)
+{
+    Mesh *mesh = malloc(sizeof(Mesh));
+    mesh->vertex_count = 0;
+    mesh->index_count = 0;
+    mesh->position = NULL;
+    mesh->uv = NULL;
+    mesh->normal = NULL;
+    mesh->index = NULL;
+
+    MeshData mesh_data = mesh_data_load(path);
+
+    for(unsigned int i = 0; i < mesh_data.face_count; i++)
+    {
+        unsigned int k = mesh->vertex_count;
+        mesh->vertex_count += mesh_data.face[i].vertex_count;
+        mesh->position = realloc(mesh->position, mesh->vertex_count * sizeof(Vector));
+        mesh->normal = realloc(mesh->normal, mesh->vertex_count * sizeof(Vector));
+        mesh->uv = realloc(mesh->uv, mesh->vertex_count * sizeof(UV));
+
+        for(unsigned int j = 0; j < mesh_data.face[i].vertex_count; j++)
+        {
+            mesh->position[j + k] = mesh_data.position[mesh_data.face[i].position[j]];
+            mesh->normal[j + k] = mesh_data.normal[mesh_data.face[i].normal[j]];
+            mesh->uv[j + k] = mesh_data.uv[mesh_data.face[i].uv[j]];
+        }
+
+        unsigned int l = mesh->index_count;
+        mesh->index_count += 3 * (mesh_data.face[i].vertex_count - 2);
+        mesh->index = realloc(mesh->index, mesh->index_count * sizeof(unsigned int));
+        triangulate(mesh->position, k, mesh->vertex_count, &mesh->index[l]);
+    }
+
+    mesh_gpu(mesh);
     return mesh;
 }
 
@@ -215,4 +269,17 @@ void mesh_draw(Mesh *mesh)
 {
     glBindVertexArray(mesh->vertex_array);
     glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+}
+
+static void triangulate(Vector *position, unsigned int left, unsigned int right, unsigned int *index_dst)
+{
+    if(index_dst == NULL)
+        return;
+
+    for(int i = left; i < right - 2; i++)
+    {
+        index_dst[3 * (i - left)] = left;
+        index_dst[3 * (i - left) + 1] = i + 1;
+        index_dst[3 * (i - left) + 2] = i + 2;
+    }
 }

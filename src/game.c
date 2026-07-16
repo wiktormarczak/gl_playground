@@ -30,10 +30,11 @@ Game *game_create()
     game->projection_matrix_location = glGetUniformLocation(game->shader_program, "projection");
 
     game->cube = mesh_create_cube(1.0);
-    MeshData pyramid = mesh_data_load("res/obj/pyramid.obj");
+    game->pyramid = mesh_load("res/obj/pyramid.obj");
 
     // Texture
     SDL_Surface *surface = IMG_Load("res/img/tux.jpg");
+    SDL_FlipSurface(surface, SDL_FLIP_VERTICAL);
     glGenTextures(1, game->texture);
     glBindTexture(GL_TEXTURE_2D, game->texture[0]);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -126,7 +127,8 @@ void game_draw(Game *game)
     // glBindVertexArray(game->vao[0]);
     // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-    mesh_draw(game->cube);
+    // mesh_draw(game->cube);
+    mesh_draw(game->pyramid);
 
     float camera_x = camera_get_x(game->camera);
     float camera_y = camera_get_y(game->camera);
