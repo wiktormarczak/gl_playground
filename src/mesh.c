@@ -2,9 +2,11 @@
 #include <gl_playground/vector.h>
 #include <gl_playground/uv.h>
 #include <gl_playground/mesh_data.h>
+#include <gl_playground/triangulate.h>
 #include <glad/gl.h>
 #include <SDL3/SDL_log.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 struct Mesh
@@ -18,8 +20,6 @@ struct Mesh
     unsigned int position_vertex_buffer, uv_vertex_buffer, normal_vertex_buffer, index_buffer;
     unsigned int vertex_array;
 };
-
-static void triangulate(Vector *position, unsigned int left, unsigned int right, unsigned int *index_dst);
 
 Mesh *mesh_create_cube(double size)
 {
@@ -213,7 +213,7 @@ Mesh *mesh_load(const char *path)
         unsigned int l = mesh->index_count;
         mesh->index_count += 3 * (mesh_data.face[i].vertex_count - 2);
         mesh->index = realloc(mesh->index, mesh->index_count * sizeof(unsigned int));
-        triangulate(mesh->position, k, mesh->vertex_count, &mesh->index[l]);
+        triangulate(mesh_data.face[i].vertex_count, &mesh->position[k], mesh->normal[k], k, &mesh->index[l]);
     }
 
     mesh_gpu(mesh);
@@ -269,17 +269,4 @@ void mesh_draw(Mesh *mesh)
 {
     glBindVertexArray(mesh->vertex_array);
     glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
-}
-
-static void triangulate(Vector *position, unsigned int left, unsigned int right, unsigned int *index_dst)
-{
-    if(index_dst == NULL)
-        return;
-
-    for(int i = left; i < right - 2; i++)
-    {
-        index_dst[3 * (i - left)] = left;
-        index_dst[3 * (i - left) + 1] = i + 1;
-        index_dst[3 * (i - left) + 2] = i + 2;
-    }
 }
